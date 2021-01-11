@@ -1,55 +1,38 @@
 package com.example.demo;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 public class MovieController {
-    private final MovieRepository repository;
-
-    public MovieController(MovieRepository repository) {
-        this.repository = repository;
-    }
+    @Autowired
+    MovieService service;
 
     @GetMapping("/movies")
-    List<Movie> all() {
-        return repository.findAll();
+    List<Movie> getall() {
+        return service.all();
     }
 
     @PostMapping("/movies")
-    Movie newMovie( Movie newMovie) {
-        return repository.save(newMovie);
+    Movie newMovie(Movie newMovie) {
+        return service.newMovie(newMovie);
     }
-
-
 
     @GetMapping("/movies/{id}")
     Movie one(@PathVariable Long id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new MovieNotFoundException());
+        return service.findOne(id);
     }
 
-
-
     @PutMapping("/movies/{id}")
-    Movie replaceMovie( Movie newMovie, @PathVariable Long id) {
-
-        return repository.findById(id)
-                .map(movie -> {
-                    movie.setTitle(newMovie.getTitle());
-                    movie.setDescription(newMovie.getDescription());
-                    return repository.save(movie);
-                })
-                .orElseGet(() -> {
-                    newMovie.setId(id);
-                    return repository.save(newMovie);
-                });
+    Movie putMovie(Movie newMovie, @PathVariable Long id) {
+        return service.replaceMovie(newMovie, id);
     }
 
     @DeleteMapping("/movies/{id}")
-    void deleteMovie(@PathVariable Long id) {
-        repository.deleteById(id);
+    void removeMovie(@PathVariable Long id) {
+        service.removeMovie(id);
     }
 
 }

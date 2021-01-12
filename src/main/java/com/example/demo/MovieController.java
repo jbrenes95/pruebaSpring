@@ -1,38 +1,51 @@
 package com.example.demo;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
-public class MovieController {
+public class MovieController implements IMovieController {
+
     @Autowired
-    MovieService service;
+    IMovieService service;
 
-    @GetMapping("/movies")
-    List<Movie> getall() {
-        return service.all();
+    public ResponseEntity<List<Movie>> getall() {
+        return ResponseEntity.ok(service.all());
     }
 
-    @PostMapping("/movies")
-    Movie newMovie(Movie newMovie) {
-        return service.newMovie(newMovie);
+    @Override
+    public ResponseEntity<String> searchDescription(String word) {
+        return null;
     }
 
-    @GetMapping("/movies/{id}")
-    Movie one(@PathVariable Long id) {
-        return service.findOne(id);
+    public ResponseEntity<Movie> one(@PathVariable Long id) {
+        return ResponseEntity.ok(service.findOne(id));
     }
 
-    @PutMapping("/movies/{id}")
-    Movie putMovie(Movie newMovie, @PathVariable Long id) {
-        return service.replaceMovie(newMovie, id);
+    public ResponseEntity<Movie> putMovie(Movie newMovie, @PathVariable Long id) {
+        return ResponseEntity.ok(service.replaceMovie(newMovie, id));
     }
 
-    @DeleteMapping("/movies/{id}")
-    void removeMovie(@PathVariable Long id) {
+    public void removeMovie(@PathVariable Long id) {
         service.removeMovie(id);
     }
 
+    @Override
+    public ResponseEntity<Movie> getBrian() {
+        Optional<Movie> movie = service.getBrian();
+        if (movie.isPresent()) {
+            return ResponseEntity.ok(movie.get());
+        }
+        return (ResponseEntity<Movie>) ResponseEntity.badRequest();
+    }
+
+    @Override
+    public ResponseEntity<Movie> newMoview(Movie movie) {
+        return ResponseEntity.ok(service.newMovie(movie));
+    }
 }
